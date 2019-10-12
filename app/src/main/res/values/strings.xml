@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">OneKey</string>
+    <string name="onekey">OneKey</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="text_email">Email</string>
+    <string name="text_enter_email_id">Enter Email ID</string>
+    <string name="text_master_password">Master Password</string>
+    <string name="text_enter_master_password">Enter Master Password</string>
+    <string name="text_forgot_password">Forgot Password?</string>
+    <string name="text_sign_out">Sign Out</string>
+    <string name="text_log_in_as_another_user">Log in as another user</string>
+    <string name="text_reenter_master_password">Re-enter Master Password</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="text_log_out">Log Out</string>
+    <string name="text_url">Url</string>
+    <string name="text_enter_url">Enter Url</string>
+    <string name="text_username">Username</string>
+    <string name="text_enter_username">Enter Username</string>
+    <string name="text_password">Password</string>
+    <string name="text_enter_password">Enter Password</string>
+    <string name="title">Add a Title...</string>
+    <string name="content">What\'s On Your Mind?</string>
+    <string name="add">Add</string>
+    <string name="strong">Strong</string>
+    <string name="medium">Medium</string>
+    <string name="weak">Weak</string>
+    <string name="invalid">Invalid Password</string>
+</resources>
