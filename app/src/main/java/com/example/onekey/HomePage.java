@@ -42,6 +42,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     public static final int ADD_PASSWORD = 1;
     private static final int ADD_NOTES = 2;
     public static final int EDIT_PASSWORD = 3;
+    public static final int EDIT_NOTES = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,41 +177,11 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new PasswordFragment()).commit();
             }
-        } else if (requestCode == ADD_NOTES) {
+        } else if (requestCode == ADD_NOTES || requestCode == EDIT_NOTES) {
             if (resultCode == RESULT_OK) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new NotesFragment()).commit();
             }
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "onPause");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(LOG_TAG, "onRestart");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(LOG_TAG, "onStop: ");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy");
     }
 }

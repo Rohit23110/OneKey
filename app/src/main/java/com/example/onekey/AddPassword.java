@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.onekey.EncryptDecryptString.encrypt;
+
 public class AddPassword extends AppCompatActivity {
 
     private static final String LOG_TAG = "AddPassword";
@@ -60,9 +62,9 @@ public class AddPassword extends AppCompatActivity {
         if (!validateForm()) {
             return;
         }
-        String URL = mURLField.getText().toString();
-        String username = mUsernameField.getText().toString();
-        String password = mPasswordField.getText().toString();
+        String URL = encrypt(mURLField.getText().toString());
+        String username = encrypt(mUsernameField.getText().toString());
+        String password = encrypt(mPasswordField.getText().toString());
 //        Toast.makeText(AddPassword.this, "URL: "+URL+" Username: "+username+
 //                " Password: "+password, Toast.LENGTH_SHORT).show();
         progressDialog.show();
@@ -163,42 +165,5 @@ public class AddPassword extends AppCompatActivity {
         }
 
         return false;
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(LOG_TAG, "onStart");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "onPause");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(LOG_TAG, "onRestart");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(LOG_TAG, "onStop: ");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy");
     }
 }

@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="20dp"
-    android:id="@+id/parent_layout">
+    android:id="@+id/parent_layout_notes">
 
     <ImageView
-        android:id="@+id/urlimagepreview"
+        android:id="@+id/titleimagepreview"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
@@ -17,23 +17,23 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="URL"
-        android:layout_toEndOf="@id/urlimagepreview"
+        android:text="Title"
+        android:layout_toEndOf="@id/titleimagepreview"
         android:layout_marginStart="10dp"
-        android:id="@+id/urlpreview"
+        android:id="@+id/titlepreview"
         android:textSize="20sp"
         android:textColor="#FFFFFF"
         />
-
     <TextView
-        android:id="@+id/username"
+        android:id="@+id/contentpreview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/urlpreview"
+        android:layout_below="@id/titlepreview"
         android:layout_marginStart="10dp"
-        android:layout_toEndOf="@id/urlimagepreview"
-        android:text="Username"
+        android:layout_toEndOf="@id/titleimagepreview"
+        android:text="Content"
         android:textColor="#FFFFFF"/>
+
 
 
 </RelativeLayout>

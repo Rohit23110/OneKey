@@ -12,6 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ViewEditNotes"
+            android:label="Edit Note"
+            android:screenOrientation="portrait">
+        </activity>
         <activity
             android:name=".ViewEditPassword"
             android:label="View Password"
@@ -23,7 +27,7 @@
         </activity>
         <activity
             android:name=".AddNotes"
-            android:label="Add Notes"
+            android:label="Add Note"
             android:parentActivityName=".HomePage"
             android:screenOrientation="portrait">
             <meta-data

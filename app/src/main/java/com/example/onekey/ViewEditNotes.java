@@ -1,9 +1,7 @@
 package com.example.onekey;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +18,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
@@ -32,13 +34,11 @@ import java.util.Date;
 
 import static com.example.onekey.EncryptDecryptString.encrypt;
 
+public class ViewEditNotes extends AppCompatActivity {
 
-public class ViewEditPassword extends AppCompatActivity {
-
-    private static final String LOG_TAG = "ViewEditPassword";
-    private EditText mEditURL;
-    private EditText mEditUsername;
-    private TextInputEditText mEditPassword;
+    private static final String LOG_TAG = "ViewEditNotes";
+    private EditText mEditTitle;
+    private EditText mEditContent;
     private ProgressDialog progressDialog;
     private String Id;
     private Timestamp timestamp;
@@ -47,63 +47,49 @@ public class ViewEditPassword extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_edit_password);
-        mEditURL = findViewById(R.id.editText_url);
-        mEditUsername = findViewById(R.id.editText_username);
-        mEditPassword = findViewById(R.id.editText_password);
+        setContentView(R.layout.activity_view_edit_notes);
+        mEditTitle = findViewById(R.id.editText_editnotes_title);
+        mEditContent = findViewById(R.id.editText_editnotes_content);
         mAuth = FirebaseAuth.getInstance();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
         Intent intent = getIntent();
-        String URL = intent.getStringExtra("URL");
-        String Username = intent.getStringExtra("Username");
-        String Password = intent.getStringExtra("Password");
+        String Title = intent.getStringExtra("Title");
+        String Content = intent.getStringExtra("Content");
         Date d = new Date();
         d.setTime(intent.getLongExtra("Timestamp", -1));
         timestamp = new Timestamp(d);
         Id = intent.getStringExtra("Id");
-        mEditURL.setText(URL);
-        mEditUsername.setText(Username);
-        mEditPassword.setText(Password);
+        mEditTitle.setText(Title);
+        mEditContent.setText(Content);
     }
 
-    public void onClickEditPassword(View view) {
-        view.setVisibility(View.INVISIBLE);
-        mEditURL.setEnabled(true);
-        mEditUsername.setEnabled(true);
-        mEditPassword.setEnabled(true);
-        getSupportActionBar().setTitle("Edit Password");
-    }
+    public void onClickSaveNotes(View view) {
+        String title = encrypt(mEditTitle.getText().toString());
+        String content = encrypt(mEditContent.getText().toString());
 
-    public void onClickSavePassword(View view) {
-        if (!validateForm()) {
-            return;
-        }
-        String url = encrypt(mEditURL.getText().toString());
-        String username = encrypt(mEditUsername.getText().toString());
-        String password = encrypt(mEditPassword.getText().toString());
         progressDialog.setMessage("Please wait while updating data");
         progressDialog.show();
-        updateData(url, username, password);
+        updateData(title, content);
     }
 
-    private void updateData(String URL, String username, String password) {
-        Password data = new Password(URL, username, password, timestamp);
+    private void updateData(String title, String content) {
+        Notes data = new Notes(title, content, timestamp);
         data.setId(Id);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         DocumentReference newPassRef = db.collection("Users").document(mAuth.getCurrentUser().getEmail())
-                .collection("URL").document(Id);
+                .collection("Notes").document(Id);
 
-        if (isNetworkConnected(ViewEditPassword.this)) {
+        if (isNetworkConnected(ViewEditNotes.this)) {
             newPassRef.set(data)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(LOG_TAG, "DocumentSnapshot successfully written!");
-                            Toast.makeText(ViewEditPassword.this, "Data updated successfully",
+                            Toast.makeText(ViewEditNotes.this, "Data updated successfully",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(true);
                         }
@@ -115,16 +101,16 @@ public class ViewEditPassword extends AppCompatActivity {
                         }
                     });
         } else {
-            Toast.makeText(ViewEditPassword.this, "Not connected to the internet",
+            Toast.makeText(ViewEditNotes.this, "Not connected to the internet",
                     Toast.LENGTH_SHORT).show();
             updateUI(false);
         }
     }
 
-    public void onClickDeletePassword(View view) {
+    public void onClickDeleteNotes(View view) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference newPassRef = db.collection("Users").document(mAuth.getCurrentUser().getEmail())
-                .collection("URL").document(Id);
+                .collection("Notes").document(Id);
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
         builder.setMessage("Do you really want to delete this data? This cannot be undone.")
@@ -132,13 +118,13 @@ public class ViewEditPassword extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         progressDialog.setMessage("Please wait while deleting data");
                         progressDialog.show();
-                        if (isNetworkConnected(ViewEditPassword.this)) {
+                        if (isNetworkConnected(ViewEditNotes.this)) {
                             newPassRef.delete()
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d(LOG_TAG, "DocumentSnapshot successfully written!");
-                                            Toast.makeText(ViewEditPassword.this, "Data updated successfully",
+                                            Toast.makeText(ViewEditNotes.this, "Data updated successfully",
                                                     Toast.LENGTH_SHORT).show();
                                             updateUI(true);
                                         }
@@ -150,7 +136,7 @@ public class ViewEditPassword extends AppCompatActivity {
                                         }
                                     });
                         } else {
-                            Toast.makeText(ViewEditPassword.this, "Not connected to the internet",
+                            Toast.makeText(ViewEditNotes.this, "Not connected to the internet",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(false);
                         }
@@ -163,36 +149,6 @@ public class ViewEditPassword extends AppCompatActivity {
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-    }
-
-    private boolean validateForm() {
-        boolean valid = true;
-
-        String url = mEditURL.getText().toString();
-        if (TextUtils.isEmpty(url)) {
-            mEditURL.setError("Required.");
-            valid = false;
-        } else {
-            mEditURL.setError(null);
-        }
-
-        String username = mEditUsername.getText().toString();
-        if (TextUtils.isEmpty(username)) {
-            mEditUsername.setError("Required.");
-            valid = false;
-        } else {
-            mEditUsername.setError(null);
-        }
-
-        String password = mEditPassword.getText().toString();
-        if (TextUtils.isEmpty(password)) {
-            mEditPassword.setError("Required.");
-            valid = false;
-        } else {
-            mEditPassword.setError(null);
-        }
-
-        return valid;
     }
 
     public void updateUI(boolean check) {
@@ -227,4 +183,14 @@ public class ViewEditPassword extends AppCompatActivity {
 
         return false;
     }
+
+    @Override
+    public void onBackPressed() {
+        String title = encrypt(mEditTitle.getText().toString());
+        String content = encrypt(mEditContent.getText().toString());
+        progressDialog.setMessage("Please wait while updating data");
+        progressDialog.show();
+        updateData(title, content);
+    }
 }
+

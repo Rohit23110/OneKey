@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 
+import static com.example.onekey.EncryptDecryptString.decrypt;
+
 public class PasswordFragment extends Fragment {
 
     private static final String LOG_TAG = "PasswordFragment";
@@ -51,7 +53,12 @@ public class PasswordFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(LOG_TAG, document.getId() + " => " + document.getData());
-                                passwordArray.add(document.toObject(Password.class));
+                                Password password;
+                                password = document.toObject(Password.class);
+                                password.setUrl(decrypt(password.getUrl()));
+                                password.setUsername(decrypt((password.getUsername())));
+                                password.setPassword(decrypt((password.getPassword())));
+                                passwordArray.add(password);
                             }
                             passwordArray.sort(Comparator.comparing(Password::getTimestamp));
                             updateUI();
@@ -77,13 +84,6 @@ public class PasswordFragment extends Fragment {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(mLayoutManager);
         return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.d("debugMode", "The application stopped after this");
-        //getPasswords();
     }
 
     private void updateUI() {
