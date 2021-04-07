@@ -1,10 +1,12 @@
 package com.example.onekey;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -14,6 +16,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -34,6 +38,7 @@ public class AddNotes extends AppCompatActivity {
     private EditText mTitle;
     private EditText mContent;
     private ProgressDialog progressDialog;
+    MenuItem itemedit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,49 @@ public class AddNotes extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         progressDialog.setMessage("Adding note...");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        setTitle("Add Note");
+        getMenuInflater().inflate(R.menu.menu, menu);
+        itemedit = menu.findItem(R.id.edit);
+        itemedit.setVisible(false);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.delete) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true);
+            builder.setMessage("Do you really want to delete this data? This cannot be undone.")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        } else {
+            String title = encrypt(mTitle.getText().toString());
+            String content = encrypt(mContent.getText().toString());
+            if(TextUtils.isEmpty(mTitle.getText().toString()) && TextUtils.isEmpty(mContent.getText().toString())) {
+                Toast.makeText(AddNotes.this, "Empty Note Discarded", Toast.LENGTH_SHORT).show();
+                super.onBackPressed();
+            } else {
+                progressDialog.setMessage("Please wait while updating data");
+                progressDialog.show();
+                addNotes(title, content);
+            }
+        }
+        return true;
     }
 
     public void onClickAddNotes(View view) {
@@ -129,7 +177,7 @@ public class AddNotes extends AppCompatActivity {
     public void onBackPressed() {
         String title = encrypt(mTitle.getText().toString());
         String content = encrypt(mContent.getText().toString());
-        if(TextUtils.isEmpty(title) && TextUtils.isEmpty(content)) {
+        if(TextUtils.isEmpty(mTitle.getText().toString()) && TextUtils.isEmpty(mContent.getText().toString())) {
             Toast.makeText(AddNotes.this, "Empty Note Discarded", Toast.LENGTH_SHORT).show();
             super.onBackPressed();
         } else {

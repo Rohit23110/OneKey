@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +33,7 @@ public class NotesFragment extends Fragment {
     private ArrayList<Notes> notesArray = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private FirebaseAuth mAuth;
+    private ProgressBar pb;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,8 +48,7 @@ public class NotesFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                Notes notes;
-                                notes = document.toObject(Notes.class);
+                                Notes notes = document.toObject(Notes.class);
                                 notes.setTitle(decrypt(notes.getTitle()));
                                 notes.setContent(decrypt((notes.getContent())));
                                 notesArray.add(notes);
@@ -75,10 +76,13 @@ public class NotesFragment extends Fragment {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(mLayoutManager);
+        pb = view.findViewById(R.id.pbLoading);
+        pb.setVisibility(ProgressBar.VISIBLE);
         return view;
     }
 
     private void updateUI() {
+        pb.setVisibility(ProgressBar.INVISIBLE);
         NotesRecyclerViewAdapter mAdapter = new NotesRecyclerViewAdapter(notesArray, getActivity());
         mRecyclerView.setAdapter(mAdapter);
     }

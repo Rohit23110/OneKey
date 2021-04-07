@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.autofill.AutofillManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,6 +42,7 @@ public class PasswordFragment extends Fragment {
     private ArrayList<Password> passwordArray = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private FirebaseAuth mAuth;
+    private ProgressBar pb;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,8 +57,7 @@ public class PasswordFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(LOG_TAG, document.getId() + " => " + document.getData());
-                                Password password;
-                                password = document.toObject(Password.class);
+                                Password password = document.toObject(Password.class);
                                 password.setUrl(decrypt(password.getUrl()));
                                 password.setUsername(decrypt((password.getUsername())));
                                 password.setPassword(decrypt((password.getPassword())));
@@ -83,10 +86,13 @@ public class PasswordFragment extends Fragment {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setLayoutManager(mLayoutManager);
+        pb = view.findViewById(R.id.pbLoading);
+        pb.setVisibility(ProgressBar.VISIBLE);
         return view;
     }
 
     private void updateUI() {
+        pb.setVisibility(ProgressBar.INVISIBLE);
         PasswordRecyclerViewAdapter mAdapter = new PasswordRecyclerViewAdapter(passwordArray, getActivity());
         mRecyclerView.setAdapter(mAdapter);
     }

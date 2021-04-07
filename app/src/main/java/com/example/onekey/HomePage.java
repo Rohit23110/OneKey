@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.autofill.AutofillManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,6 +45,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private static final int ADD_NOTES = 2;
     public static final int EDIT_PASSWORD = 3;
     public static final int EDIT_NOTES = 4;
+    private AutofillManager autofillManager;
+    private FirebaseUser user;
+    private Snackbar snackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         mAuth = FirebaseAuth.getInstance();
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -98,6 +104,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         db.collection("Users").document(mAuth.getCurrentUser().getEmail())
                 .set(data, SetOptions.merge());
 
+        snackbar = Snackbar.make(findViewById(android.R.id.content),
+                "Default Autofill Service Not Set Up", Snackbar.LENGTH_INDEFINITE);
     }
 
 //    public void onClickSignOut(View view) {
@@ -155,6 +163,17 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 getSupportActionBar().setTitle("Notes");
                 break;
 
+            case R.id.nav_account:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new AccountFragment()).commit();
+                getSupportActionBar().setTitle("Account");
+                break;
+
+            case R.id.nav_autofill_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+
             case R.id.nav_log_out:
                 signOut();
         }
@@ -167,6 +186,14 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     protected void onStart() {
         super.onStart();
         Log.d(LOG_TAG, "onStart");
+        autofillManager = getSystemService(android.view.autofill.AutofillManager.class);
+        if(!autofillManager.hasEnabledAutofillServices()) {
+            Log.d(LOG_TAG, "onStart: Hi");
+            snackbar.show();
+        } else {
+            Log.d(LOG_TAG, "onStart: Bye");
+            snackbar.dismiss();
+        }
     }
 
     @Override
@@ -182,6 +209,53 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new NotesFragment()).commit();
             }
+        }
+    }
+
+    public void onClickResetPassword(View view) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+
+        String useremail = user.getEmail();
+        builder.setMessage("Do you want to reset password for "+useremail+"?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        sendPasswordReset();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void sendPasswordReset() {
+        // [START send_password_reset]
+        String email = user.getEmail();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(LOG_TAG, "Email sent.");
+                            Toast.makeText(HomePage.this, "Please check your email for resetting password",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI2(user);
+                        }
+                    }
+                });
+    }
+
+    public void updateUI2(FirebaseUser user) {
+        if (user != null) {
+            Intent intent = new Intent(this, SignedIn.class);
+            startActivity(intent);
+            finish();
         }
     }
 }

@@ -6,6 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +28,13 @@ public class Splash extends AppCompatActivity {
         Log.d(LOG_TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        TextView text = findViewById(R.id.text_one_key);
+        ImageView image = findViewById(R.id.one_key_logo);
+        Animation animation1 =
+                AnimationUtils.loadAnimation(getApplicationContext(),
+                        R.anim.fade);
+        image.startAnimation(animation1);
+        text.startAnimation(animation1);
         final Intent intent = new Intent(this, Welcome.class);
 
         mRunnable = new Runnable() {

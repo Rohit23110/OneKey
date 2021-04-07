@@ -25,7 +25,7 @@
     <EditText
         android:id="@+id/editText_editnotes_content"
         android:layout_width="416dp"
-        android:layout_height="562dp"
+        android:layout_height="600dp"
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"
@@ -37,27 +37,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText_editnotes_title" />
-
-    <Button
-        android:id="@+id/button_editnotes_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:onClick="onClickSaveNotes"
-        android:text="Save"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText_editnotes_content" />
-
-    <Button
-        android:id="@+id/button_editnotes_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
-        android:onClick="onClickDeleteNotes"
-        android:text="Delete"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText_editnotes_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

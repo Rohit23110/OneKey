@@ -14,6 +14,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -43,6 +45,7 @@ public class ViewEditNotes extends AppCompatActivity {
     private String Id;
     private Timestamp timestamp;
     private FirebaseAuth mAuth;
+    MenuItem itemedit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,71 @@ public class ViewEditNotes extends AppCompatActivity {
         Id = intent.getStringExtra("Id");
         mEditTitle.setText(Title);
         mEditContent.setText(Content);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        setTitle("Edit Note");
+        getMenuInflater().inflate(R.menu.menu, menu);
+        itemedit = menu.findItem(R.id.edit);
+        itemedit.setVisible(false);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.delete) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            DocumentReference newPassRef = db.collection("Users").document(mAuth.getCurrentUser().getEmail())
+                    .collection("Notes").document(Id);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true);
+            builder.setMessage("Do you really want to delete this data? This cannot be undone.")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            progressDialog.setMessage("Please wait while deleting data");
+                            progressDialog.show();
+                            if (isNetworkConnected(ViewEditNotes.this)) {
+                                newPassRef.delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(LOG_TAG, "DocumentSnapshot successfully written!");
+                                                Toast.makeText(ViewEditNotes.this, "Data updated successfully",
+                                                        Toast.LENGTH_SHORT).show();
+                                                updateUI(true);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w(LOG_TAG, "Error writing document", e);
+                                            }
+                                        });
+                            } else {
+                                Toast.makeText(ViewEditNotes.this, "Not connected to the internet",
+                                        Toast.LENGTH_SHORT).show();
+                                updateUI(false);
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        } else {
+            String title = encrypt(mEditTitle.getText().toString());
+            String content = encrypt(mEditContent.getText().toString());
+
+            progressDialog.setMessage("Please wait while updating data");
+            progressDialog.show();
+            updateData(title, content);
+        }
+        return true;
     }
 
     public void onClickSaveNotes(View view) {
@@ -107,49 +175,49 @@ public class ViewEditNotes extends AppCompatActivity {
         }
     }
 
-    public void onClickDeleteNotes(View view) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference newPassRef = db.collection("Users").document(mAuth.getCurrentUser().getEmail())
-                .collection("Notes").document(Id);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setMessage("Do you really want to delete this data? This cannot be undone.")
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        progressDialog.setMessage("Please wait while deleting data");
-                        progressDialog.show();
-                        if (isNetworkConnected(ViewEditNotes.this)) {
-                            newPassRef.delete()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(LOG_TAG, "DocumentSnapshot successfully written!");
-                                            Toast.makeText(ViewEditNotes.this, "Data updated successfully",
-                                                    Toast.LENGTH_SHORT).show();
-                                            updateUI(true);
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(LOG_TAG, "Error writing document", e);
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(ViewEditNotes.this, "Not connected to the internet",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(false);
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
+//    public void onClickDeleteNotes(View view) {
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        DocumentReference newPassRef = db.collection("Users").document(mAuth.getCurrentUser().getEmail())
+//                .collection("Notes").document(Id);
+//        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setCancelable(true);
+//        builder.setMessage("Do you really want to delete this data? This cannot be undone.")
+//                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        progressDialog.setMessage("Please wait while deleting data");
+//                        progressDialog.show();
+//                        if (isNetworkConnected(ViewEditNotes.this)) {
+//                            newPassRef.delete()
+//                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            Log.d(LOG_TAG, "DocumentSnapshot successfully written!");
+//                                            Toast.makeText(ViewEditNotes.this, "Data updated successfully",
+//                                                    Toast.LENGTH_SHORT).show();
+//                                            updateUI(true);
+//                                        }
+//                                    })
+//                                    .addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception e) {
+//                                            Log.w(LOG_TAG, "Error writing document", e);
+//                                        }
+//                                    });
+//                        } else {
+//                            Toast.makeText(ViewEditNotes.this, "Not connected to the internet",
+//                                    Toast.LENGTH_SHORT).show();
+//                            updateUI(false);
+//                        }
+//                    }
+//                })
+//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                });
+//        AlertDialog alertDialog = builder.create();
+//        alertDialog.show();
+//    }
 
     public void updateUI(boolean check) {
         progressDialog.dismiss();

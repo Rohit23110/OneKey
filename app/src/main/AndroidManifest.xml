@@ -12,9 +12,34 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ViewEditNotes"
+
+        <activity android:name=".SettingsActivity"
+            android:exported="true"
+            android:label="Autofill Settings"
+            android:taskAffinity=".SettingsActivity">
+        </activity>
+
+        <service
+            android:name=".MyAutofillService"
+            android:label="OneKey"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/autofill_service" />
+
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".ViewEditNotes"
             android:label="Edit Note"
+            android:parentActivityName=".HomePage"
             android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.onekey.HomePage" />
         </activity>
         <activity
             android:name=".ViewEditPassword"
@@ -62,6 +87,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.onekey.Welcome" />
         </activity>
+
         <activity
             android:name=".SignIn"
             android:label="@string/sign_in"
@@ -72,6 +98,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.onekey.Welcome" />
         </activity>
+
         <activity
             android:name=".Splash"
             android:screenOrientation="portrait"

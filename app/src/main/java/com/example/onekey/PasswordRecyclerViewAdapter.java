@@ -20,6 +20,7 @@ public class PasswordRecyclerViewAdapter extends RecyclerView.Adapter<PasswordRe
     private static final String TAG = "RecyclerViewAdapter";
     private ArrayList<Password> mPassword;
     private Context mContext;
+    private String passwordreuser;
 
     public PasswordRecyclerViewAdapter(ArrayList<Password> mPassword, Context mContext) {
         this.mPassword = mPassword;
@@ -36,9 +37,22 @@ public class PasswordRecyclerViewAdapter extends RecyclerView.Adapter<PasswordRe
     @Override
     public void onBindViewHolder(@NonNull PasswordRecyclerViewAdapter.ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: called.");
+        int reusecounter=0;
         holder.urlImagePreview.setImageResource(R.drawable.password_icon);
         holder.urlPreview.setText(mPassword.get(position).getUrl());
         holder.username.setText(mPassword.get(position).getUsername());
+        passwordreuser = mPassword.get(position).getPassword();
+        for(int i = 0;i<mPassword.size();i++)
+        {
+            if(passwordreuser.equals(mPassword.get(i).getPassword()))
+            {
+                reusecounter++;
+            }
+        }
+        if(reusecounter>1)
+        {
+            holder.reusedpassword.setText("This password has been reused "+reusecounter+" times.");
+        }
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +80,7 @@ public class PasswordRecyclerViewAdapter extends RecyclerView.Adapter<PasswordRe
         ImageView urlImagePreview;
         TextView urlPreview;
         TextView username;
+        TextView reusedpassword;
         RelativeLayout parentLayout;
 
         public ViewHolder(@NonNull View itemView) {
@@ -73,6 +88,7 @@ public class PasswordRecyclerViewAdapter extends RecyclerView.Adapter<PasswordRe
             urlImagePreview = itemView.findViewById(R.id.urlimagepreview);
             urlPreview = itemView.findViewById(R.id.urlpreview);
             username = itemView.findViewById(R.id.username);
+            reusedpassword = itemView.findViewById(R.id.password_reuse);
             parentLayout = itemView.findViewById(R.id.parent_layout);
         }
     }
